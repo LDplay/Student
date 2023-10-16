@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using System;
 
-namespace Student_space
+namespace StudentSpace
 {
     public class Address
     {
@@ -18,7 +18,7 @@ namespace Student_space
         }
     }
 
-    public class Student : Address
+    public class Student 
     {
         private string surName;
         private string firstName;
