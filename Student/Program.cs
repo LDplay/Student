@@ -1,4 +1,4 @@
-﻿using Student_space;
+using StudentSpace;
 class Program
 {
     static void Main()
