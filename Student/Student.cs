@@ -96,4 +96,86 @@ namespace StudentSpace
             DisplayGrades("Exam Grades", ExamGrades);
         }
     }
+    public class Group
+    {
+        private List<Student> students;
+        public string GroupName { get; set; }
+        public string Specialization { get; set; }
+        public int CourseNumber { get; set; }
+
+        public Group()
+        {
+            students = new List<Student>();
+            GroupName = "P15 Group";
+            Specialization = "Programming";
+            CourseNumber = 1;
+        }
+
+        public Group(List<Student> initialStudents, string groupName, string specialization, int courseNumber)
+        {
+            students = initialStudents;
+            GroupName = groupName;
+            Specialization = specialization;
+            CourseNumber = courseNumber;
+        }
+
+        public Group(Group otherGroup)
+        {
+            students = new List<Student>(otherGroup.students);
+            GroupName = otherGroup.GroupName;
+            Specialization = otherGroup.Specialization;
+            CourseNumber = otherGroup.CourseNumber;
+        }
+
+        public void ShowStudents()
+        {
+            Console.WriteLine($"Group Name: {GroupName}");
+            Console.WriteLine($"Specialization: {Specialization}");
+            Console.WriteLine($"Course Number: {CourseNumber}");
+            Console.WriteLine("Students:");
+
+            var sortedStudents = students.OrderBy(s => s.SurName).ThenBy(s => s.FirstName).ToList();
+
+            for (int i = 0; i < sortedStudents.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {sortedStudents[i].SurName} {sortedStudents[i].FirstName}");
+            }
+        }
+
+        public void AddStudent(Student student)
+        {
+            students.Add(student);
+        }
+
+        public void EditGroupInfo(string groupName, string specialization, int courseNumber)
+        {
+            GroupName = groupName;
+            Specialization = specialization;
+            CourseNumber = courseNumber;
+        }
+
+        public void TransferStudent(Student student, Group newGroup)
+        {
+            if (students.Contains(student))
+            {
+                students.Remove(student);
+                newGroup.AddStudent(student);
+            }
+        }
+
+        public void ExpelFailedStudents()
+        {
+            students.RemoveAll(student =>
+                student.ExamGrades.Average() < 60);
+        }
+
+        public void ExpelWorstStudent()
+        {
+            var worstStudent = students.OrderBy(student => student.ExamGrades.Average()).FirstOrDefault();
+            if (worstStudent != null)
+            {
+                students.Remove(worstStudent);
+            }
+        }
+    }
 }
