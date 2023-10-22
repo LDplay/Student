@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using System;
+using System.Collections;
 
 namespace StudentSpace
 {
@@ -18,7 +17,7 @@ namespace StudentSpace
         }
     }
 
-    public class Student 
+    public class Student : IComparable<Student>
     {
         private string surName;
         private string firstName;
@@ -74,6 +73,61 @@ namespace StudentSpace
             set { phoneNumber = value; }
         }
 
+        //Реализация CompareTo
+        public int CompareTo(Student other)
+        {
+            if (other == null)
+                return 1;
+
+            double thisAvgHomeworkGrade = CalculateAverageHomeworkGrade();
+            double otherAvgHomeworkGrade = other.CalculateAverageHomeworkGrade();
+
+            if (thisAvgHomeworkGrade > otherAvgHomeworkGrade)
+                return 1;
+            else if (thisAvgHomeworkGrade < otherAvgHomeworkGrade)
+                return -1;
+            else
+                return 0;
+        }
+
+        //Два вложенных класса
+        public class LastNameComparer : IComparer<Student>
+        {
+            public int Compare(Student x, Student y)
+            {
+                if (x == null || y == null)
+                    return 0;
+
+                return string.Compare(x.LastName, y.LastName, StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
+        public class BirthDateComparer : IComparer<Student>
+        {
+            public int Compare(Student x, Student y)
+            {
+                if (x == null || y == null)
+                    return 0;
+
+                return DateTime.Compare(x.BirthDate, y.BirthDate);
+            }
+        }
+
+        public double CalculateAverageHomeworkGrade()
+        {
+            if (HomeworkGrades == null || HomeworkGrades.Length == 0)
+            {
+                return 0.0;
+            }
+
+            double sum = 0;
+            foreach (int grade in HomeworkGrades)
+            {
+                sum += grade;
+            }
+
+            return sum / HomeworkGrades.Length;
+        }
         private void DisplayGrades(string gradeType, int[] grades)
         {
             Console.Write($"{gradeType}: ");
@@ -95,8 +149,61 @@ namespace StudentSpace
             DisplayGrades("Project Grades", ProjectGrades);
             DisplayGrades("Exam Grades", ExamGrades);
         }
+
+        //Перегрузки операторов
+        public static bool operator ==(Student student1, Student student2)
+        {
+            if (ReferenceEquals(student1, student2))
+            {
+                return true;
+            }
+
+            if (ReferenceEquals(student1, null) || ReferenceEquals(student2, null))
+            {
+                return false;
+            }
+
+            return student1.CalculateAverageHomeworkGrade() == student2.CalculateAverageHomeworkGrade();
+        }
+
+        public static bool operator !=(Student student1, Student student2)
+        {
+            return !(student1 == student2);
+        }
+
+        public static bool operator >(Student student1, Student student2)
+        {
+            return student1.CalculateAverageHomeworkGrade() > student2.CalculateAverageHomeworkGrade();
+        }
+
+        public static bool operator <(Student student1, Student student2)
+        {
+            return student1.CalculateAverageHomeworkGrade() < student2.CalculateAverageHomeworkGrade();
+        }
+
+        public static bool operator >=(Student student1, Student student2)
+        {
+            return student1.CalculateAverageHomeworkGrade() >= student2.CalculateAverageHomeworkGrade();
+        }
+
+        public static bool operator <=(Student student1, Student student2)
+        {
+            return student1.CalculateAverageHomeworkGrade() <= student2.CalculateAverageHomeworkGrade();
+        }
+
+        //Перегрузка True\False
+        public static bool operator true(Student student)
+        {
+            return student.CalculateAverageHomeworkGrade() >= 7;
+        }
+
+        public static bool operator false(Student student)
+        {
+            return student.CalculateAverageHomeworkGrade() < 7;
+        }
+
     }
-    public class Group
+    public class Group : IEnumerable<Student>
     {
         private List<Student> students;
         public string GroupName { get; set; }
@@ -125,6 +232,45 @@ namespace StudentSpace
             GroupName = otherGroup.GroupName;
             Specialization = otherGroup.Specialization;
             CourseNumber = otherGroup.CourseNumber;
+        }
+
+        // Одномерный Индекстатор
+        public Student this[int index]
+        {
+            get
+            {
+                if (index >= 0 && index < students.Count)
+                {
+                    return students[index];
+                }
+                else
+                {
+                    throw new IndexOutOfRangeException("Index is out of range");
+                }
+            }
+
+            set
+            {
+                if (index >= 0 && index < students.Count)
+                {
+                    students[index] = value;
+                }
+                else
+                {
+                    throw new IndexOutOfRangeException("Index is out of range");
+                }
+            }
+        }
+
+        //Реализыция GetEnumerator
+        public IEnumerator<Student> GetEnumerator()
+        {
+            return students.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
 
         public void ShowStudents()
